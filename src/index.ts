@@ -10,11 +10,12 @@ let settings: Settings;
 // bootstrap
 try {
   settings = JSON.parse(
-    readFileSync(join(__dirname, '..', 'bot-settings.json'), { encoding: 'utf8' })
+    readFileSync(join(__dirname, '..', 'bot-config.json'), { encoding: 'utf8' })
   );
 } catch (e) {
-  console.error('Failed loading Bot Settings', e);
-  throw new Error('Failed loading Bot Settings');
+  const errorMsg = 'Failed loading bot-config.json';
+  console.error(errorMsg, e);
+  throw new Error(errorMsg);
 }
 
 process.argv.forEach((arg) => {

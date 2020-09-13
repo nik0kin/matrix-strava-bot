@@ -1,6 +1,8 @@
 {
   "homeserverUrl": "https://localhost",
   "matrixAccessToken": "YourSecretAccessToken",
+  "stravaClientId": "YourStravaApiClientId",
+  "stravaClientSecret": "YourStravaApiClientSecret",
   "stravaAccessToken": "YourSecretAccessToken",
   "stravaRefreshToken": "YourSecretRefreshToken",
   "stravaClub": "YourClub",
