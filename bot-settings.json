@@ -1,0 +1,10 @@
+{
+  "homeserverUrl": "https://localhost",
+  "matrixAccessToken": "YourSecretAccessToken",
+  "stravaAccessToken": "YourSecretAccessToken",
+  "stravaClub": "YourClub",
+  "pollFrequency": 600,
+  "emoji": true,
+  "links": true,
+  "onBotJoinRoomMessage": "Reporting <club> activities"
+}
