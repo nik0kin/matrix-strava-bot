@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
 import { MatrixClient } from 'matrix-bot-sdk';
-import strava from 'strava-v3';
 
 import { getClubActivityString } from './message-formatter';
 import { Settings } from './settings';
 import { createMatrixClient, sendMessageToAllJoinedRooms } from './matrix-bot';
-import { ClubActivity } from './strava';
+import { ClubActivity, listStravaClubActivities } from './strava';
+import { exists } from 'fs';
 
 const PER_PAGE = 30;
 
@@ -23,52 +23,54 @@ async function poll(settings: Settings, botClient: MatrixClient) {
 let lastClubActivitiesData: ClubActivity[] = [];
 
 async function checkForRecentActivities(settings: Settings, botClient: MatrixClient) {
-  // typing lies: doesnt support promises
-  strava.clubs.listActivities({ id: settings.stravaClub, per_page: PER_PAGE, access_token: settings.stravaAccessToken }, (err, data: ClubActivity[]) => {
-    if (err) {
-      console.log('checkForRecentActivities error: ', err);
-      return;
-    }
-    console.log('checkForRecentActivities');
-    const activitiesMessage = data
-      .filter((a) => {
-        return !lastClubActivitiesData.map((a) => JSON.stringify(a)).includes(JSON.stringify(a)); // TODO cleanup
-      })
-      .map((a) => getClubActivityString(a, settings)).join('\n');
-    console.log(activitiesMessage);
-    if (!settings.dryRun) {
-      sendMessageToAllJoinedRooms(botClient, activitiesMessage);
-    }
-    lastClubActivitiesData = data;
-    botClient.storageProvider.storeValue('lastClubActivitiesData', JSON.stringify(data));
-  });
+  let data: ClubActivity[];
+  try {
+    data = await listStravaClubActivities({ id: settings.stravaClub, per_page: PER_PAGE, access_token: settings.stravaAccessToken });
+  } catch (e) {
+    throw new Error('List Strava Club Activities API error: ' + JSON.stringify(e));
+  }
+
+  console.log('checkForRecentActivities');
+  const activitiesMessage = data
+    .filter((a) => !hasBeenReported(a))
+    .map((a) => getClubActivityString(a, settings)).join('\n');
+  console.log(activitiesMessage);
+  if (!settings.dryRun) {
+    sendMessageToAllJoinedRooms(botClient, activitiesMessage);
+  }
+  lastClubActivitiesData = data;
+  botClient.storageProvider.storeValue('lastClubActivitiesData', JSON.stringify(data));
 }
 
 
-export function startPoll(settings: Settings) {
+export async function startPoll(settings: Settings) {
   const botClient = createMatrixClient(settings);
 
-  botClient.start()
-    .then(async () => {
-      console.log(settings.onBotJoinRoomMessage || 'onBotJoinRoomMessage');
+  await botClient.start();
 
-      if (settings.onBotJoinRoomMessage && !settings.dryRun) {
-        sendMessageToAllJoinedRooms(botClient, settings.onBotJoinRoomMessage);
+  console.log(settings.onBotJoinRoomMessage || 'onBotJoinRoomMessage');
 
-        botClient.on('room.join', (roomId: string) => {
-          botClient.sendText(roomId, settings.onBotJoinRoomMessage);
-        });
-      }
+  if (settings.onBotJoinRoomMessage && !settings.dryRun) {
+    sendMessageToAllJoinedRooms(botClient, settings.onBotJoinRoomMessage);
 
-      const result = botClient.storageProvider.readValue('lastClubActivitiesData');
-      if (typeof result === 'string') {
-        lastClubActivitiesData = JSON.parse(result);
-      } else if (result && (result as any).then) {
-        lastClubActivitiesData = JSON.parse(await (result as Promise<string>));
-      } else {
-        lastClubActivitiesData = [];
-      }
-
-      poll(settings, botClient);
+    botClient.on('room.join', (roomId: string) => {
+      botClient.sendText(roomId, settings.onBotJoinRoomMessage);
     });
+  }
+
+  const result = botClient.storageProvider.readValue('lastClubActivitiesData');
+  if (typeof result === 'string') {
+    lastClubActivitiesData = JSON.parse(result);
+  } else if (result && (result as any).then) {
+    lastClubActivitiesData = JSON.parse(await (result as Promise<string>));
+  } else {
+    lastClubActivitiesData = [];
+  }
+
+  poll(settings, botClient);
+}
+
+function hasBeenReported(activity: ClubActivity) {
+  const stringifiedActivities = lastClubActivitiesData.map((a) => JSON.stringify(a));
+  return stringifiedActivities.includes(JSON.stringify(activity));
 }

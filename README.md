@@ -1,4 +1,5 @@
 # matrix-strava-bot
 
-Every Poll Time
-  - look at club activities since the last pollTime
+Generate an accessToken at https://www.strava.com/settings/api
+
+Uses Strava v3 api: http://developers.strava.com/docs/reference/
