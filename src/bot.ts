@@ -1,19 +1,35 @@
 /* eslint-disable no-console */
-import { MatrixClient } from 'matrix-bot-sdk';
+import { MatrixClient, SimpleFsStorageProvider } from 'matrix-bot-sdk';
 
 import { getClubActivityString } from './message-formatter';
 import { Settings } from './settings';
 import { createMatrixClient, sendMessageToAllJoinedRooms } from './matrix-bot';
-import { ClubActivity, listStravaClubActivities } from './strava';
+import { ClubActivity, listStravaClubActivities, setupStrava } from './strava';
+import { getStravaAccessTokenExpiresAt, refreshStravaAccessToken, getStravaAccessToken } from './strava-auth';
 
 const PER_PAGE = 30;
 
 async function poll(settings: Settings, botClient: MatrixClient) {
+  if (getStravaAccessTokenExpiresAt(botClient) < Date.now()) {
+    console.log('Refreshing token');
+    try {
+      refreshStravaAccessToken(settings, botClient);
+    } catch (e) {
+      console.error('Could not refresh access token when needed', e);
+      setPollTimeout(settings, botClient);
+      return;
+    }
+  }
+
   try {
     await checkForRecentActivities(settings, botClient);
   } catch (e) {
     console.error('Something went wrong polling', e);
   }
+  setPollTimeout(settings, botClient);
+}
+
+function setPollTimeout(settings: Settings, botClient: MatrixClient) {
   setTimeout(() => {
     poll(settings, botClient);
   }, settings.pollFrequency * 1000);
@@ -24,7 +40,11 @@ let lastClubActivitiesData: ClubActivity[] = [];
 async function checkForRecentActivities(settings: Settings, botClient: MatrixClient) {
   let data: ClubActivity[];
   try {
-    data = await listStravaClubActivities({ id: settings.stravaClub, per_page: PER_PAGE, access_token: settings.stravaAccessToken });
+    data = await listStravaClubActivities({
+      id: settings.stravaClub,
+      per_page: PER_PAGE,
+      access_token: getStravaAccessToken(settings, botClient)
+    });
   } catch (e) {
     throw new Error('List Strava Club Activities API error: ' + JSON.stringify(e));
   }
@@ -46,12 +66,12 @@ async function checkForRecentActivities(settings: Settings, botClient: MatrixCli
 
 
 export async function startPoll(settings: Settings) {
+  // Connect to Matrix
   const botClient = createMatrixClient(settings);
-
   await botClient.start();
 
+  // Send startup message
   console.log(settings.onBotJoinRoomMessage || 'onBotJoinRoomMessage');
-
   if (settings.onBotJoinRoomMessage && !settings.dryRun) {
     sendMessageToAllJoinedRooms(botClient, settings.onBotJoinRoomMessage);
 
@@ -60,13 +80,21 @@ export async function startPoll(settings: Settings) {
     });
   }
 
-  const result = botClient.storageProvider.readValue('lastClubActivitiesData');
+  setupStrava(settings);
+
+  // Load Last Activities from storage
+  const result = (botClient.storageProvider as SimpleFsStorageProvider).readValue('lastClubActivitiesData');
   if (typeof result === 'string') {
     lastClubActivitiesData = JSON.parse(result);
-  } else if (result && (result as any).then) {
-    lastClubActivitiesData = JSON.parse(await (result as Promise<string>));
   } else {
     lastClubActivitiesData = [];
+  }
+
+  // Check/Refresh access token
+  try {
+    refreshStravaAccessToken(settings, botClient);
+  } catch (e) {
+    throw new Error('Could not refresh Strava token on startup. Is settings.stravaRefreshToken set? ' + JSON.stringify(e));
   }
 
   poll(settings, botClient);
