@@ -9,5 +9,6 @@
   "pollFrequency": 600,
   "emoji": true,
   "links": true,
-  "onBotJoinRoomMessage": "Reporting our Club activities"
+  "onBotJoinRoomMessage": "Reporting our Club activities",
+  "autoJoin": false
 }

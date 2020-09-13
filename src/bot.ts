@@ -13,7 +13,7 @@ async function poll(settings: Settings, botClient: MatrixClient) {
   if (getStravaAccessTokenExpiresAt(botClient) < Date.now()) {
     console.log('Refreshing token');
     try {
-      refreshStravaAccessToken(settings, botClient);
+      await refreshStravaAccessToken(settings, botClient);
     } catch (e) {
       console.error('Could not refresh access token when needed', e);
       setPollTimeout(settings, botClient);
@@ -92,7 +92,7 @@ export async function startPoll(settings: Settings) {
 
   // Check/Refresh access token
   try {
-    refreshStravaAccessToken(settings, botClient);
+    await refreshStravaAccessToken(settings, botClient);
   } catch (e) {
     throw new Error('Could not refresh Strava token on startup. Is settings.stravaRefreshToken set? ' + JSON.stringify(e));
   }
