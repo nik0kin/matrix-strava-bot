@@ -2,6 +2,7 @@
   "homeserverUrl": "https://localhost",
   "matrixAccessToken": "YourSecretAccessToken",
   "stravaAccessToken": "YourSecretAccessToken",
+  "stravaRefreshToken": "YourSecretRefreshToken",
   "stravaClub": "YourClub",
   "pollFrequency": 600,
   "emoji": true,

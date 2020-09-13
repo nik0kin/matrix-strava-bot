@@ -5,7 +5,6 @@ import { getClubActivityString } from './message-formatter';
 import { Settings } from './settings';
 import { createMatrixClient, sendMessageToAllJoinedRooms } from './matrix-bot';
 import { ClubActivity, listStravaClubActivities } from './strava';
-import { exists } from 'fs';
 
 const PER_PAGE = 30;
 
@@ -34,6 +33,9 @@ async function checkForRecentActivities(settings: Settings, botClient: MatrixCli
   const activitiesMessage = data
     .filter((a) => !hasBeenReported(a))
     .map((a) => getClubActivityString(a, settings)).join('\n');
+  if (!activitiesMessage) {
+    return;
+  }
   console.log(activitiesMessage);
   if (!settings.dryRun) {
     sendMessageToAllJoinedRooms(botClient, activitiesMessage);
