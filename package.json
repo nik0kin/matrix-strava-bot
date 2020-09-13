@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "// ------ DEVELOPMENT ----- //": "",
-    "debug": "nodemon src/index.ts",
+    "dev": "nodemon src/index.ts --dryrun",
     "convert": "ts-jest config:migrate ./jest.config.js",
     "// ------ TESTING ----- //": "",
     "test": "jest --watch",
@@ -16,7 +16,7 @@
     "// ------ LINTING ----- //": "",
     "lint": "eslint . --ext .ts",
     "// ------ PRODUCTION ----- //": "",
-    "start": "nodemon -I src/index.ts"
+    "start": "ts-node src/index.ts"
   },
   "keywords": [
     "Matrix",
