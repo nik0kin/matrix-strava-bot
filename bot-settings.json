@@ -2,9 +2,9 @@
   "homeserverUrl": "https://localhost",
   "matrixAccessToken": "YourSecretAccessToken",
   "stravaAccessToken": "YourSecretAccessToken",
-  "stravaClub": "tgpbike",
+  "stravaClub": "YourClub",
   "pollFrequency": 600,
   "emoji": true,
   "links": true,
-  "onBotJoinRoomMessage": "Reporting <club> activities"
+  "onBotJoinRoomMessage": "Reporting our Club activities"
 }

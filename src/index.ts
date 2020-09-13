@@ -17,10 +17,6 @@ try {
   throw new Error('Failed loading Bot Settings');
 }
 
-if (settings.onBotJoinRoomMessage) {
-  settings.onBotJoinRoomMessage = settings.onBotJoinRoomMessage.replace('<club>', settings.stravaClub);
-}
-
 process.argv.forEach((arg) => {
   if (arg.toLowerCase().includes('--dryrun')) {
     settings.dryRun = true;

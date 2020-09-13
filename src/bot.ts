@@ -34,7 +34,7 @@ async function checkForRecentActivities(settings: Settings, botClient: MatrixCli
       .filter((a) => {
         return !lastClubActivitiesData.map((a) => JSON.stringify(a)).includes(JSON.stringify(a)); // TODO cleanup
       })
-      .map((a) => getClubActivityString(a)).join('\n');
+      .map((a) => getClubActivityString(a, settings)).join('\n');
     console.log(activitiesMessage);
     if (!settings.dryRun) {
       sendMessageToAllJoinedRooms(botClient, activitiesMessage);

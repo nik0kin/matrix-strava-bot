@@ -1,9 +1,50 @@
-// import { Settings } from './settings';
+import { Settings } from './settings';
 import { ClubActivity } from './strava';
 
+const activityTypeEmojiMapping = {
+  AlpineSki: '',
+  BackcountrySki: '',
+  Canoeing: '',
+  Crossfit: '',
+  EBikeRide: '',
+  Elliptical: '',
+  Golf: '',
+  Handcycle: '',
+  Hike: '',
+  IceSkate: '',
+  InlineSkate: '',
+  Kayaking: '',
+  Kitesurf: '',
+  NordicSki: '',
+  Ride: '🚲️',
+  RockClimbing: '',
+  RollerSki: '',
+  Rowing: '',
+  Run: '🏃',
+  Sail: '',
+  Skateboard: '',
+  Snowboard: '',
+  Snowshoe: '',
+  Soccer: '',
+  StairStepper: '',
+  StandUpPaddling: '',
+  Surfing: '',
+  Swim: '',
+  Velomobile: '',
+  VirtualRide: '',
+  VirtualRun: '',
+  Walk: '🚶',
+  WeightTraining: '',
+  Wheelchair: '',
+  Windsurf: '',
+  Workout: '',
+  Yoga: '',
+} as const;
+
 // "Bob Roberts: ActivityTitle - 4.44 kilometers in 3:13 minutes"
-export function getClubActivityString(item: ClubActivity/*, settings?: Settings, htmlFormatted?: boolean*/) {
-  return `${item.athlete.firstname} ${item.athlete.lastname} - ${item.name} - ${
+export function getClubActivityString(item: ClubActivity, settings: Settings) {
+  const typeEmoji = settings.emoji ? activityTypeEmojiMapping[item.type as keyof typeof activityTypeEmojiMapping] || '' : '';
+  return `${item.athlete.firstname} ${item.athlete.lastname} ${typeEmoji || '-'} ${item.name} - ${
     formatNumber(item.distance / 1000)} kilometers in ${secondsToMinutes(item.moving_time)} minutes`;
 }
 
