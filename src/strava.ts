@@ -1,12 +1,11 @@
-import strava from 'strava-v3';
-
-import { Settings } from './settings';
-
-export function setupStrava(settings: Settings) {
-  strava.config({
-    "access_token": settings.accessToken,
-    "client_id": "Your apps Client ID (Required for oauth)",
-    "client_secret": "Your apps Client Secret (Required for oauth)",
-    "redirect_uri": "Your apps Authorization Redirection URI (Required for oauth)",
-  });
+export interface ClubActivity {
+  resource_state: number,
+  athlete: { resource_state: number, firstname: string, lastname: string },
+  name: string,
+  distance: number,
+  moving_time: number,
+  elapsed_time: number,
+  total_elevation_gain: number,
+  type: string,
+  workout_type: any
 }

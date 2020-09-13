@@ -1,20 +1,19 @@
-import { Settings } from './settings';
-import { capitalizeFirstLetter } from './string-util';
+// import { Settings } from './settings';
+import { ClubActivity } from './strava';
 
-// "Rare Costume Top: Hatchling - 4500K"
-export function getShopItemString(item: any, settings: Settings, htmlFormatted: boolean) {
-  // const rarityEmoji = settings.emoji ? getRarityEmoji(item.rarity) : '';
-  // const typeEmoji = settings.emoji ? getTypeEmoji(item.type) : '';
-  // const currencyEmoji = settings.emoji ? getCurrencyEmoji(item.currency) : '';
-
-  const rarity = capitalizeFirstLetter(item.rarity);
-
-  const itemLink = '';
-  const name = settings.links
-    ? !htmlFormatted ? `[${item.name}](${itemLink})` : `<a href="${itemLink}">${item.name}</a>`
-    : item.name;
-
-  return `${rarity}: ${name}`;
+// "Bob Roberts: ActivityTitle - 4.44 kilometers in 3:13 minutes"
+export function getClubActivityString(item: ClubActivity/*, settings?: Settings, htmlFormatted?: boolean*/) {
+  return `${item.athlete.firstname} ${item.athlete.lastname} - ${item.name} - ${
+    formatNumber(item.distance / 1000)} kilometers in ${secondsToMinutes(item.moving_time)} minutes`;
 }
 
+function secondsToMinutes(seconds: number) {
+  const sec = seconds % 60;
+  return `${Math.floor(seconds / 60)}:${(sec < 10 ? '0' : '') + sec}`;
+}
 
+function formatNumber(num: number, decimalPlaces = 2) {
+  const a = Math.pow(10, decimalPlaces);
+  num = Math.round(num * a) / a;
+  return `${num}`;
+}

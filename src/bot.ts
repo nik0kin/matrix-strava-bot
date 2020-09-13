@@ -2,15 +2,14 @@
 import { MatrixClient } from 'matrix-bot-sdk';
 import strava from 'strava-v3';
 
-import { getShopItemString } from './message-formatter';
+import { getClubActivityString } from './message-formatter';
 import { Settings } from './settings';
 import { createMatrixClient, sendMessageToAllJoinedRooms } from './matrix-bot';
-import { setupStrava } from './strava';
+import { ClubActivity } from './strava';
 
-// let lastFeaturedShopItems: [ShopItem, ShopItem, ShopItem];
-let lastTimeChecked: string;
+const PER_PAGE = 30;
 
-async function poll(settings: Settings, botClient?: MatrixClient) {
+async function poll(settings: Settings, botClient: MatrixClient) {
   try {
     await checkForRecentActivities(settings, botClient);
   } catch (e) {
@@ -21,31 +20,55 @@ async function poll(settings: Settings, botClient?: MatrixClient) {
   }, settings.pollFrequency * 1000);
 }
 
-async function checkForRecentActivities(settings: Settings, botClient?: MatrixClient) {
+let lastClubActivitiesData: ClubActivity[] = [];
+
+async function checkForRecentActivities(settings: Settings, botClient: MatrixClient) {
   // typing lies: doesnt support promises
-  strava.clubs.listActivities({ id: settings.stravaClub }, (data) => {
-    console.log('checkForRecentActivities', data);
+  strava.clubs.listActivities({ id: settings.stravaClub, per_page: PER_PAGE, access_token: settings.stravaAccessToken }, (err, data: ClubActivity[]) => {
+    if (err) {
+      console.log('checkForRecentActivities error: ', err);
+      return;
+    }
+    console.log('checkForRecentActivities');
+    const activitiesMessage = data
+      .filter((a) => {
+        return !lastClubActivitiesData.map((a) => JSON.stringify(a)).includes(JSON.stringify(a)); // TODO cleanup
+      })
+      .map((a) => getClubActivityString(a)).join('\n');
+    console.log(activitiesMessage);
+    if (!settings.dryRun) {
+      sendMessageToAllJoinedRooms(botClient, activitiesMessage);
+    }
+    lastClubActivitiesData = data;
+    botClient.storageProvider.storeValue('lastClubActivitiesData', JSON.stringify(data));
   });
-  // lastTimeChecked = now
 }
 
 
 export function startPoll(settings: Settings) {
-  setupStrava(settings);
-  // const botClient = createMatrixClient(settings);
+  const botClient = createMatrixClient(settings);
 
-  // botClient.start()
-  //   .then(() => {
-  //     console.log(settings.onBotJoinRoomMessage || 'onBotJoinRoomMessage');
+  botClient.start()
+    .then(async () => {
+      console.log(settings.onBotJoinRoomMessage || 'onBotJoinRoomMessage');
 
-  //     if (settings.onBotJoinRoomMessage) {
-  //       sendMessageToAllJoinedRooms(botClient, settings.onBotJoinRoomMessage);
+      if (settings.onBotJoinRoomMessage && !settings.dryRun) {
+        sendMessageToAllJoinedRooms(botClient, settings.onBotJoinRoomMessage);
 
-  //       botClient.on('room.join', (roomId: string) => {
-  //         botClient.sendText(roomId, settings.onBotJoinRoomMessage);
-  //       });
-  //     }
-  //     poll(settings, botClient);
-  //   });
-  poll(settings);
+        botClient.on('room.join', (roomId: string) => {
+          botClient.sendText(roomId, settings.onBotJoinRoomMessage);
+        });
+      }
+
+      const result = botClient.storageProvider.readValue('lastClubActivitiesData');
+      if (typeof result === 'string') {
+        lastClubActivitiesData = JSON.parse(result);
+      } else if (result && (result as any).then) {
+        lastClubActivitiesData = JSON.parse(await (result as Promise<string>));
+      } else {
+        lastClubActivitiesData = [];
+      }
+
+      poll(settings, botClient);
+    });
 }

@@ -3,8 +3,9 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 import { startPoll } from './bot';
+import { Settings } from './settings';
 
-let settings: any;
+let settings: Settings;
 
 // bootstrap
 try {
@@ -13,6 +14,17 @@ try {
   );
 } catch (e) {
   console.error('Failed loading Bot Settings', e);
+  throw new Error('Failed loading Bot Settings');
 }
+
+if (settings.onBotJoinRoomMessage) {
+  settings.onBotJoinRoomMessage = settings.onBotJoinRoomMessage.replace('<club>', settings.stravaClub);
+}
+
+process.argv.forEach((arg) => {
+  if (arg.toLowerCase().includes('--dryrun')) {
+    settings.dryRun = true;
+  }
+});
 
 startPoll(settings);
