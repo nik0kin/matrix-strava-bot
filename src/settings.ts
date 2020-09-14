@@ -9,8 +9,9 @@ export interface Settings {
   stravaRefreshToken: string;
   stravaClub: string;
   //// Bot settings ////
-  autoJoin: boolean;
+  storageFile?: string;
   pollFrequency: number; // In seconds
+  autoJoin: boolean;
   emoji: boolean;
   links: boolean;
   onBotJoinRoomMessage: string;

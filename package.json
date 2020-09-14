@@ -7,7 +7,6 @@
   "scripts": {
     "// ------ DEVELOPMENT ----- //": "",
     "dev": "nodemon src/bootstrap.ts --dryrun",
-    "convert": "ts-jest config:migrate ./jest.config.js",
     "// ------ TESTING ----- //": "",
     "test": "jest --watch",
     "coverage": "jest --collectCoverageFrom=src/**/*.ts --coverage",
