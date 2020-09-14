@@ -1,30 +1,11 @@
 {
   "name": "matrix-strava-bot",
-  "version": "0.1.0",
   "description": "A chatbot that reports Strava club activities",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "// ------ DEVELOPMENT ----- //": "",
-    "dev": "nodemon src/bootstrap.ts --dryrun",
-    "// ------ TESTING ----- //": "",
-    "test": "jest --watch",
-    "coverage": "jest --collectCoverageFrom=src/**/*.ts --coverage",
-    "// ------ BUILDING ----- //": "",
-    "build": "tsc --module commonjs",
-    "build:watch": "tsc --module commonjs -w",
-    "// ------ LINTING ----- //": "",
-    "lint": "eslint . --ext .ts",
-    "// ------ PRODUCTION ----- //": "",
-    "start": "ts-node src/bootstrap.ts"
-  },
-  "keywords": [
-    "Matrix",
-    "Bot",
-    "Strava"
-  ],
+  "version": "0.1.0",
   "author": "Nik0kin",
-  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/nik0kin/matrix-strava-bot/issues"
+  },
   "dependencies": {
     "date-fns": "^2.16.1",
     "matrix-bot-sdk": "^0.5.6",
@@ -38,7 +19,7 @@
     "eslint": "^5.15.1",
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-prettier": "^3.0.1",
-    "jest": "^24.3.0",
+    "jest": "^26.4.2",
     "nodemon": "^1.18.10",
     "prettier": "^1.16.4",
     "ts-jest": "^26.3.0",
@@ -47,5 +28,27 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "homepage": "https://github.com/nik0kin/matrix-strava-bot",
+  "keywords": [
+    "Bot",
+    "Matrix",
+    "Strava"
+  ],
+  "license": "AGPL-3.0-or-later",
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nik0kin/matrix-strava-bot.git"
+  },
+  "scripts": {
+    "build": "tsc --module commonjs",
+    "build:watch": "tsc --module commonjs -w",
+    "coverage": "jest --collectCoverageFrom=src/**/*.ts --coverage",
+    "dev": "nodemon src/bootstrap.ts --dryrun",
+    "lint": "eslint . --ext .ts",
+    "start": "ts-node src/bootstrap.ts",
+    "test": "jest --watch"
+  },
+  "types": "dist/index.d.ts"
 }
