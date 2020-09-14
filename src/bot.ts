@@ -76,7 +76,7 @@ export async function startPoll(settings: Settings) {
     sendMessageToAllJoinedRooms(botClient, settings.onBotJoinRoomMessage);
 
     botClient.on('room.join', (roomId: string) => {
-      botClient.sendText(roomId, settings.onBotJoinRoomMessage);
+      botClient.sendText(roomId, settings.onBotJoinRoomMessage!);
     });
   }
 
