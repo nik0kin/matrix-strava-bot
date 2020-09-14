@@ -6,7 +6,7 @@ import { RefreshTokenResponse } from './strava';
 
 const accessTokenKey = 'stravaAccessToken';
 const accessTokenExpiresAtKey = 'stravaAccessTokenExpiresAt';
-const refreshTokenKey = 'stravaAccessTokenExpiresAt';
+const refreshTokenKey = 'refreshTokenKey';
 
 export async function refreshStravaAccessToken(settings: Settings, botClient: MatrixClient) {
   // The current accessToken will be returned if it's not expired yet
