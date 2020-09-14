@@ -46,13 +46,16 @@ const activityTypeEmojiMapping: Record<string, string> = {
 
 // "Bob Roberts: ActivityTitle - 4.44 kilometers in 3 minutes 13 seconds"
 export function getClubActivityString(item: ClubActivity, settings: Settings) {
-  const typeEmoji = settings.emoji ? activityTypeEmojiMapping[item.type] || '' : '';
+  const typeEmoji = settings.emoji
+    ? activityTypeEmojiMapping[item.type] || ''
+    : '';
   const kilometers = item.distance / 1000;
-  const distance = !settings.useMiles ?
-    `${formatNumber(kilometers)} kilometers` :
-    `${formatNumber(toMiles(kilometers))} miles`;
-  return `${item.athlete.firstname} ${item.athlete.lastname} ${typeEmoji || '-'} ${item.name} - ${
-    distance} in ${getDurationString(item.moving_time)}`;
+  const distance = !settings.useMiles
+    ? `${formatNumber(kilometers)} kilometers`
+    : `${formatNumber(toMiles(kilometers))} miles`;
+  return `${item.athlete.firstname} ${item.athlete.lastname} ${
+    typeEmoji || '-'
+  } ${item.name} - ${distance} in ${getDurationString(item.moving_time)}`;
 }
 
 function getDurationString(totalSeconds: number) {
@@ -62,7 +65,7 @@ function getDurationString(totalSeconds: number) {
     const minutes = Math.floor(totalSeconds / 60) % 60;
     return formatDuration({
       hours,
-      minutes
+      minutes,
     });
   }
 
@@ -70,7 +73,7 @@ function getDurationString(totalSeconds: number) {
   const seconds = totalSeconds % 60;
   return formatDuration({
     minutes,
-    seconds
+    seconds,
   });
 }
 

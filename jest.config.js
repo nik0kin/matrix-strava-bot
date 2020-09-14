@@ -11,4 +11,3 @@ module.exports = {
   testRegex: '(/src/.*\\.(test|spec))\\.(jsx?|tsx?)$',
   testEnvironment: 'node',
 };
-

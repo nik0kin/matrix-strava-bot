@@ -4,10 +4,10 @@ import { Settings } from './settings';
 
 export function setupStrava(settings: Settings) {
   strava.config({
-    'access_token': settings.stravaAccessToken,
-    'client_id': settings.stravaClientId,
-    'client_secret': settings.stravaClientSecret,
-    'redirect_uri': '', // We don't need this since we aren't sending user's through oauth
+    access_token: settings.stravaAccessToken,
+    client_id: settings.stravaClientId,
+    client_secret: settings.stravaClientSecret,
+    redirect_uri: '', // We don't need this since we aren't sending user's through oauth
   });
 }
 

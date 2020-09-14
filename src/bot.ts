@@ -5,7 +5,11 @@ import { getClubActivityString } from './message-formatter';
 import { Settings } from './settings';
 import { createMatrixClient, sendMessageToAllJoinedRooms } from './matrix-bot';
 import { ClubActivity, listStravaClubActivities, setupStrava } from './strava';
-import { getStravaAccessTokenExpiresAt, refreshStravaAccessToken, getStravaAccessToken } from './strava-auth';
+import {
+  getStravaAccessTokenExpiresAt,
+  refreshStravaAccessToken,
+  getStravaAccessToken,
+} from './strava-auth';
 
 const PER_PAGE = 30;
 
@@ -37,22 +41,28 @@ function setPollTimeout(settings: Settings, botClient: MatrixClient) {
 
 let lastClubActivitiesData: ClubActivity[] = [];
 
-async function checkForRecentActivities(settings: Settings, botClient: MatrixClient) {
+async function checkForRecentActivities(
+  settings: Settings,
+  botClient: MatrixClient
+) {
   let data: ClubActivity[];
   try {
     data = await listStravaClubActivities({
       id: settings.stravaClub,
       per_page: PER_PAGE,
-      access_token: getStravaAccessToken(settings, botClient)
+      access_token: getStravaAccessToken(settings, botClient),
     });
   } catch (e) {
-    throw new Error('List Strava Club Activities API error: ' + JSON.stringify(e));
+    throw new Error(
+      'List Strava Club Activities API error: ' + JSON.stringify(e)
+    );
   }
 
   console.log('checkForRecentActivities');
   const activitiesMessage = data
     .filter((a) => !hasBeenReported(a))
-    .map((a) => getClubActivityString(a, settings)).join('\n');
+    .map((a) => getClubActivityString(a, settings))
+    .join('\n');
   if (!activitiesMessage) {
     return;
   }
@@ -61,9 +71,11 @@ async function checkForRecentActivities(settings: Settings, botClient: MatrixCli
     sendMessageToAllJoinedRooms(botClient, activitiesMessage);
   }
   lastClubActivitiesData = data;
-  botClient.storageProvider.storeValue('lastClubActivitiesData', JSON.stringify(data));
+  botClient.storageProvider.storeValue(
+    'lastClubActivitiesData',
+    JSON.stringify(data)
+  );
 }
-
 
 export async function startPoll(settings: Settings) {
   // Connect to Matrix
@@ -83,7 +95,9 @@ export async function startPoll(settings: Settings) {
   setupStrava(settings);
 
   // Load Last Activities from storage
-  const result = (botClient.storageProvider as SimpleFsStorageProvider).readValue('lastClubActivitiesData');
+  const result = (botClient.storageProvider as SimpleFsStorageProvider).readValue(
+    'lastClubActivitiesData'
+  );
   if (typeof result === 'string') {
     lastClubActivitiesData = JSON.parse(result);
   } else {
@@ -94,13 +108,18 @@ export async function startPoll(settings: Settings) {
   try {
     await refreshStravaAccessToken(settings, botClient);
   } catch (e) {
-    throw new Error('Could not refresh Strava token on startup. Is settings.stravaRefreshToken set? ' + JSON.stringify(e));
+    throw new Error(
+      'Could not refresh Strava token on startup. Is settings.stravaRefreshToken set? ' +
+        JSON.stringify(e)
+    );
   }
 
   poll(settings, botClient);
 }
 
 function hasBeenReported(activity: ClubActivity) {
-  const stringifiedActivities = lastClubActivitiesData.map((a) => JSON.stringify(a));
+  const stringifiedActivities = lastClubActivitiesData.map((a) =>
+    JSON.stringify(a)
+  );
   return stringifiedActivities.includes(JSON.stringify(activity));
 }
