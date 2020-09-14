@@ -14,6 +14,7 @@ export interface Settings {
   emoji: boolean;
   links: boolean;
   onBotJoinRoomMessage: string;
+  useMiles: boolean;
 
   //// Debug ////
   dryRun: boolean;

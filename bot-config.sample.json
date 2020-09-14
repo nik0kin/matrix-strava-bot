@@ -10,5 +10,6 @@
   "emoji": true,
   "links": true,
   "onBotJoinRoomMessage": "Reporting our Club activities",
+  "useMiles": false,
   "autoJoin": false
 }

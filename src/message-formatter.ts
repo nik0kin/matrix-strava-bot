@@ -1,5 +1,6 @@
 import { Settings } from './settings';
 import { ClubActivity } from './strava';
+import { toMiles } from './distance';
 
 const activityTypeEmojiMapping = {
   AlpineSki: '',
@@ -44,8 +45,12 @@ const activityTypeEmojiMapping = {
 // "Bob Roberts: ActivityTitle - 4.44 kilometers in 3:13 minutes"
 export function getClubActivityString(item: ClubActivity, settings: Settings) {
   const typeEmoji = settings.emoji ? activityTypeEmojiMapping[item.type as keyof typeof activityTypeEmojiMapping] || '' : '';
+  const kilometers = item.distance / 1000;
+  const distance = !settings.useMiles ?
+    `${formatNumber(kilometers)} kilometers` :
+    `${formatNumber(toMiles(kilometers))} miles`;
   return `${item.athlete.firstname} ${item.athlete.lastname} ${typeEmoji || '-'} ${item.name} - ${
-    formatNumber(item.distance / 1000)} kilometers in ${secondsToMinutes(item.moving_time)} minutes`;
+    distance} in ${secondsToMinutes(item.moving_time)} minutes`;
 }
 
 function secondsToMinutes(seconds: number) {
