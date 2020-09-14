@@ -77,7 +77,10 @@ async function checkForRecentActivities(
   );
 }
 
-export async function startPoll(settings: Settings) {
+/**
+ * Starts the Matrix bot and refreshes the Strava accessToken
+ */
+export async function startBot(settings: Settings) {
   // Connect to Matrix
   const botClient = createMatrixClient(settings);
   await botClient.start();
@@ -110,7 +113,7 @@ export async function startPoll(settings: Settings) {
   } catch (e) {
     throw new Error(
       'Could not refresh Strava token on startup. Is settings.stravaRefreshToken set? ' +
-        JSON.stringify(e)
+      JSON.stringify(e)
     );
   }
 

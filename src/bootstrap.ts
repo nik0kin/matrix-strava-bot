@@ -2,7 +2,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-import { startPoll } from './bot';
+import { startBot } from './bot';
 import { Settings } from './settings';
 
 let settings: Settings;
@@ -24,4 +24,4 @@ process.argv.forEach((arg) => {
   }
 });
 
-startPoll(settings);
+startBot(settings);

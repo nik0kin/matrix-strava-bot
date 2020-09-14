@@ -37,13 +37,13 @@ yarn add matrix-strava-bot
 ```
 
 ```
-import { startPoll } from 'matrix-strava-bot';
+import { startBot } from 'matrix-strava-bot';
 
 const config = {
   // see bot-config.same.json
 };
 
-startPoll(config);
+startBot(config);
 ```
 
 ## Config
