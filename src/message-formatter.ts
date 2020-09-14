@@ -1,8 +1,10 @@
+import { formatDuration } from 'date-fns';
+
 import { Settings } from './settings';
 import { ClubActivity } from './strava';
 import { toMiles } from './distance';
 
-const activityTypeEmojiMapping = {
+const activityTypeEmojiMapping: Record<string, string> = {
   AlpineSki: '',
   BackcountrySki: '',
   Canoeing: '',
@@ -40,22 +42,36 @@ const activityTypeEmojiMapping = {
   Windsurf: '',
   Workout: '',
   Yoga: '',
-} as const;
+};
 
-// "Bob Roberts: ActivityTitle - 4.44 kilometers in 3:13 minutes"
+// "Bob Roberts: ActivityTitle - 4.44 kilometers in 3 minutes 13 seconds"
 export function getClubActivityString(item: ClubActivity, settings: Settings) {
-  const typeEmoji = settings.emoji ? activityTypeEmojiMapping[item.type as keyof typeof activityTypeEmojiMapping] || '' : '';
+  const typeEmoji = settings.emoji ? activityTypeEmojiMapping[item.type] || '' : '';
   const kilometers = item.distance / 1000;
   const distance = !settings.useMiles ?
     `${formatNumber(kilometers)} kilometers` :
     `${formatNumber(toMiles(kilometers))} miles`;
   return `${item.athlete.firstname} ${item.athlete.lastname} ${typeEmoji || '-'} ${item.name} - ${
-    distance} in ${secondsToMinutes(item.moving_time)} minutes`;
+    distance} in ${getDurationString(item.moving_time)}`;
 }
 
-function secondsToMinutes(seconds: number) {
-  const sec = seconds % 60;
-  return `${Math.floor(seconds / 60)}:${(sec < 10 ? '0' : '') + sec}`;
+function getDurationString(totalSeconds: number) {
+  const hours = Math.floor(totalSeconds / 60 / 60);
+
+  if (hours > 0) {
+    const minutes = Math.floor(totalSeconds / 60) % 60;
+    return formatDuration({
+      hours,
+      minutes
+    });
+  }
+
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return formatDuration({
+    minutes,
+    seconds
+  });
 }
 
 function formatNumber(num: number, decimalPlaces = 2) {

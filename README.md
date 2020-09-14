@@ -3,10 +3,10 @@
 Reports Strava club activities.
 
 ```
-Kingo T. 🚶 Afternoon Walk - 3.13 kilometers in 30:19 minutes
+Kingo T. 🚶 Afternoon Walk - 3.13 kilometers in 30 minutes 19 seconds
 ```
 
-Unfortunately due to public Strava API restrictions, we cannot query more information on a given club activity, and thus the bot can't link to it
+Unfortunately due to public Strava API restrictions, we cannot query more information on a given club activity, and thus the bot can't link to it.
 
 ## Develop
 
