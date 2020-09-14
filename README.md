@@ -17,16 +17,36 @@ yarn dev
 
 ## Run
 
+### Bootstrap mode
+
 ```
+# clone repo
+yarn install
+
+cp bot-config.sample.json bot-config.json
+# configure bot-config.json
+
 yarn global add pm2
 pm2 start pm2.config.js
 ```
 
-## Config
+### As a Node.js package
 
 ```
-cp bot-config.sample.json bot-config.json
+yarn add matrix-strava-bot
 ```
+
+```
+import { startPoll } from 'matrix-strava-bot';
+
+const config = {
+  // see bot-config.same.json
+};
+
+startPoll(config);
+```
+
+## Config
 
 See [settings.ts](./src/settings.ts) for config descriptions
 

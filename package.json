@@ -2,7 +2,8 @@
   "name": "matrix-strava-bot",
   "version": "0.1.0",
   "description": "A chatbot that reports Strava club activities",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "// ------ DEVELOPMENT ----- //": "",
     "dev": "nodemon src/bootstrap.ts --dryrun",
@@ -11,8 +12,8 @@
     "test": "jest --watch",
     "coverage": "jest --collectCoverageFrom=src/**/*.ts --coverage",
     "// ------ BUILDING ----- //": "",
-    "build": "tsc",
-    "build:watch": "tsc -w",
+    "build": "tsc --module commonjs",
+    "build:watch": "tsc --module commonjs -w",
     "// ------ LINTING ----- //": "",
     "lint": "eslint . --ext .ts",
     "// ------ PRODUCTION ----- //": "",
@@ -31,13 +32,8 @@
     "strava-v3": "^2.0.5"
   },
   "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.3.4",
-    "@babel/polyfill": "^7.2.5",
-    "@babel/preset-env": "^7.3.4",
     "@types/jest": "^24.0.12",
     "@types/node": "^11.10.5",
-    "@types/node-fetch": "^2.5.7",
     "@typescript-eslint/eslint-plugin": "^1.4.2",
     "@typescript-eslint/parser": "^1.4.2",
     "eslint": "^5.15.1",
@@ -49,5 +45,8 @@
     "ts-jest": "^26.3.0",
     "ts-node": "^8.0.3",
     "typescript": "^3.7.2"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }
