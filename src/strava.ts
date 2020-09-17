@@ -34,7 +34,12 @@ export function listStravaClubActivities(args: any): Promise<ClubActivity[]> {
       if (err) {
         return reject(err);
       }
-      resolve(data);
+      // Remove workout_type to make caching simpler (workout_type changes from undefined to null on a user updating their activity)
+      const dataWithoutWorkoutType = (data as ClubActivity[]).map(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        ({ workout_type, ...rest }) => rest
+      );
+      resolve(dataWithoutWorkoutType);
     });
   });
 }
