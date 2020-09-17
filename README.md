@@ -40,7 +40,7 @@ yarn add matrix-strava-bot
 import { startBot } from 'matrix-strava-bot';
 
 const config = {
-  // see bot-config.same.json
+  // see bot-config.sample.json
 };
 
 startBot(config);

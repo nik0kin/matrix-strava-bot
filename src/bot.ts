@@ -113,7 +113,7 @@ export async function startBot(settings: Settings) {
   } catch (e) {
     throw new Error(
       'Could not refresh Strava token on startup. Is settings.stravaRefreshToken set? ' +
-      JSON.stringify(e)
+        JSON.stringify(e)
     );
   }
 
