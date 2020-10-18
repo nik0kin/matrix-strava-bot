@@ -1,10 +1,11 @@
 /* eslint-disable no-console */
 import { MatrixClient, SimpleFsStorageProvider } from 'matrix-bot-sdk';
+import { ClubActivity } from 'strava-v3';
 
 import { getClubActivityString } from './message-formatter';
 import { Settings } from './settings';
 import { createMatrixClient, sendMessageToAllJoinedRooms } from './matrix-bot';
-import { ClubActivity, listStravaClubActivities, setupStrava } from './strava';
+import { listStravaClubActivities, setupStrava } from './strava';
 import {
   getStravaAccessTokenExpiresAt,
   refreshStravaAccessToken,

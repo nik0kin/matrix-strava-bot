@@ -1,7 +1,7 @@
 import { formatDuration } from 'date-fns';
+import { ClubActivity } from 'strava-v3';
 
 import { Settings } from './settings';
-import { ClubActivity } from './strava';
 import { toMiles } from './distance';
 
 const activityTypeEmojiMapping: Record<string, string> = {
