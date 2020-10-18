@@ -67,10 +67,22 @@ export interface Settings {
   /**
    * Optional Message outputted on bot startup and joining rooms
    */
-  onBotJoinRoomMessage?: string;
+  onBotJoinRoomMessage: string | undefined;
   /**
    * Display the club activity message in miles
    *   Defaults to `false`
    */
   useMiles?: boolean;
+  /**
+   * Display club activity elevation
+   *   Defaults to `true`
+   */
+  includeElevation?: boolean;
+  /**
+   * Display club activity average speed (distance/moving_time)
+   *   Defaults to `true`
+   */
+  includeSpeed?: boolean;
 }
+
+export type SettingsWithDefaults = Required<Settings>;

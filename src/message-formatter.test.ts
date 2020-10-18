@@ -21,4 +21,17 @@ describe('getClubActivityString', () => {
       getClubActivityString(clubActivitiesFixture[1], { useMiles: true } as any)
     ).toEqual('Alfred C. - Morning Run - 6.27 miles in 1 hour');
   });
+  test('should work in miles mode with elevation and average speed', () => {
+    const settings: any = {
+      useMiles: true,
+      includeSpeed: true,
+      includeElevation: true,
+    };
+    expect(getClubActivityString(clubActivitiesFixture[0], settings)).toEqual(
+      'Carl M. - Morning Ride - 7.29 miles in 1 hour 21 minutes (5.4mph), 1657.81ft elev gain'
+    );
+    expect(getClubActivityString(clubActivitiesFixture[1], settings)).toEqual(
+      'Alfred C. - Morning Run - 6.27 miles in 1 hour (6.26mph), 254.59ft elev gain'
+    );
+  });
 });

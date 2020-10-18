@@ -1,2 +1,2 @@
 export * from './bot';
-export * from './settings';
+export { Settings } from './settings';

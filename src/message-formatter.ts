@@ -1,8 +1,8 @@
 import { formatDuration } from 'date-fns';
 import { ClubActivity } from 'strava-v3';
 
-import { Settings } from './settings';
-import { toMiles } from './distance';
+import { SettingsWithDefaults } from './settings';
+import { toMiles, toFt } from './distance';
 
 const activityTypeEmojiMapping: Record<string, string> = {
   AlpineSki: '',
@@ -45,7 +45,10 @@ const activityTypeEmojiMapping: Record<string, string> = {
 };
 
 // "Bob Roberts: ActivityTitle - 4.44 kilometers in 3 minutes 13 seconds"
-export function getClubActivityString(item: ClubActivity, settings: Settings) {
+export function getClubActivityString(
+  item: ClubActivity,
+  settings: SettingsWithDefaults
+) {
   const typeEmoji = settings.emoji
     ? activityTypeEmojiMapping[item.type] || ''
     : '';
@@ -53,9 +56,20 @@ export function getClubActivityString(item: ClubActivity, settings: Settings) {
   const distance = !settings.useMiles
     ? `${formatNumber(kilometers)} kilometers`
     : `${formatNumber(toMiles(kilometers))} miles`;
+  const average = settings.includeSpeed
+    ? getAverageString(item, settings.useMiles)
+    : '';
+  const elevGain = !settings.useMiles
+    ? `${formatNumber(item.total_elevation_gain)}m`
+    : `${formatNumber(toFt(item.total_elevation_gain))}ft`;
+  const elevGainStr = settings.includeElevation
+    ? `, ${elevGain} elev gain`
+    : '';
   return `${item.athlete.firstname} ${item.athlete.lastname} ${
     typeEmoji || '-'
-  } ${item.name} - ${distance} in ${getDurationString(item.moving_time)}`;
+  } ${item.name} - ${distance} in ${getDurationString(
+    item.moving_time
+  )}${average}${elevGainStr}`;
 }
 
 function getDurationString(totalSeconds: number) {
@@ -75,6 +89,15 @@ function getDurationString(totalSeconds: number) {
     minutes,
     seconds,
   });
+}
+
+function getAverageString(item: ClubActivity, useMiles: boolean) {
+  const kilometers = item.distance / 1000;
+  const distance = useMiles ? toMiles(kilometers) : kilometers;
+  const timeInHours = item.moving_time / 60 / 60;
+  return ` (${formatNumber(distance / timeInHours)}${
+    useMiles ? 'mph' : 'kmph'
+  })`;
 }
 
 function formatNumber(num: number, decimalPlaces = 2) {

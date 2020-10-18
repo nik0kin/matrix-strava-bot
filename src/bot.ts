@@ -3,7 +3,7 @@ import { MatrixClient, SimpleFsStorageProvider } from 'matrix-bot-sdk';
 import { ClubActivity } from 'strava-v3';
 
 import { getClubActivityString } from './message-formatter';
-import { Settings } from './settings';
+import { Settings, SettingsWithDefaults } from './settings';
 import { createMatrixClient, sendMessageToAllJoinedRooms } from './matrix-bot';
 import { listStravaClubActivities, setupStrava } from './strava';
 import {
@@ -14,7 +14,7 @@ import {
 
 const PER_PAGE = 30;
 
-async function poll(settings: Settings, botClient: MatrixClient) {
+async function poll(settings: SettingsWithDefaults, botClient: MatrixClient) {
   if (getStravaAccessTokenExpiresAt(botClient) < Date.now()) {
     console.log('Refreshing token');
     try {
@@ -34,7 +34,10 @@ async function poll(settings: Settings, botClient: MatrixClient) {
   setPollTimeout(settings, botClient);
 }
 
-function setPollTimeout(settings: Settings, botClient: MatrixClient) {
+function setPollTimeout(
+  settings: SettingsWithDefaults,
+  botClient: MatrixClient
+) {
   setTimeout(() => {
     poll(settings, botClient);
   }, settings.pollFrequency * 1000);
@@ -43,7 +46,7 @@ function setPollTimeout(settings: Settings, botClient: MatrixClient) {
 let lastClubActivitiesData: ClubActivity[] = [];
 
 async function checkForRecentActivities(
-  settings: Settings,
+  settings: SettingsWithDefaults,
   botClient: MatrixClient
 ) {
   let data: ClubActivity[];
@@ -81,7 +84,17 @@ async function checkForRecentActivities(
 /**
  * Starts the Matrix bot and refreshes the Strava accessToken
  */
-export async function startBot(settings: Settings) {
+export async function startBot(userSettings: Settings) {
+  const settings: SettingsWithDefaults = {
+    storageFile: 'bot-storage.json',
+    dryRun: false,
+    autoJoin: false,
+    useMiles: false,
+    includeSpeed: true,
+    includeElevation: true,
+    ...userSettings,
+  };
+
   // Connect to Matrix
   const botClient = createMatrixClient(settings);
   await botClient.start();
