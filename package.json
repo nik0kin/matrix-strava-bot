@@ -1,7 +1,7 @@
 {
   "name": "matrix-strava-bot",
   "description": "A chatbot that reports Strava club activities",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Nik0kin",
   "bugs": {
     "url": "https://github.com/nik0kin/matrix-strava-bot/issues"
