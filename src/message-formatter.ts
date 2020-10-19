@@ -60,8 +60,8 @@ export function getClubActivityString(
     ? getAverageString(item, settings.useMiles)
     : '';
   const elevGain = !settings.useMiles
-    ? `${formatNumber(item.total_elevation_gain)}m`
-    : `${formatNumber(toFt(item.total_elevation_gain))}ft`;
+    ? `${formatNumber(item.total_elevation_gain, 1)}m`
+    : `${formatNumber(toFt(item.total_elevation_gain), 1)}ft`;
   const elevGainStr = settings.includeElevation
     ? `, ${elevGain} elev gain`
     : '';
