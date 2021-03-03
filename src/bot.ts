@@ -3,7 +3,11 @@ import { MatrixClient, SimpleFsStorageProvider } from 'matrix-bot-sdk';
 import { ClubActivity } from 'strava-v3';
 
 import { getClubActivityString } from './message-formatter';
-import { Settings, SettingsWithDefaults } from './settings';
+import {
+  Settings,
+  SettingsWithDefaults,
+  getSettingsWithDefaults,
+} from './settings';
 import { createMatrixClient, sendMessageToAllJoinedRooms } from './matrix-bot';
 import { listStravaClubActivities, setupStrava } from './strava';
 import {
@@ -85,15 +89,7 @@ async function checkForRecentActivities(
  * Starts the Matrix bot and refreshes the Strava accessToken
  */
 export async function startBot(userSettings: Settings) {
-  const settings: SettingsWithDefaults = {
-    storageFile: 'bot-storage.json',
-    dryRun: false,
-    autoJoin: false,
-    useMiles: false,
-    includeSpeed: true,
-    includeElevation: true,
-    ...userSettings,
-  };
+  const settings = getSettingsWithDefaults(userSettings);
 
   // Connect to Matrix
   const botClient = createMatrixClient(settings);

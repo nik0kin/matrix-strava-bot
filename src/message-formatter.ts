@@ -1,7 +1,7 @@
 import { formatDuration } from 'date-fns';
 import { ClubActivity } from 'strava-v3';
 
-import { SettingsWithDefaults } from './settings';
+import { SettingsWithDefaults, SpeedUnit } from './settings';
 import { toMiles, toFt } from './distance';
 
 const activityTypeEmojiMapping: Record<string, string> = {
@@ -44,7 +44,7 @@ const activityTypeEmojiMapping: Record<string, string> = {
   Yoga: '🧘',
 };
 
-// "Bob Roberts: ActivityTitle - 4.44 kilometers in 3 minutes 13 seconds"
+// "Bob R. - ActivityTitle - 6.27 miles in 1 hour (6.26mph), 254.6ft elev gain"
 export function getClubActivityString(
   item: ClubActivity,
   settings: SettingsWithDefaults
@@ -53,15 +53,18 @@ export function getClubActivityString(
     ? activityTypeEmojiMapping[item.type] || ''
     : '';
   const kilometers = item.distance / 1000;
-  const distance = !settings.useMiles
-    ? `${formatNumber(kilometers)} kilometers`
-    : `${formatNumber(toMiles(kilometers))} miles`;
+  const distance =
+    settings.distanceUnit === 'kilometer'
+      ? `${formatNumber(kilometers)} kilometers`
+      : `${formatNumber(toMiles(kilometers))} miles`;
+  const speedUnit = getSpeedUnit(item.type, settings);
   const average = settings.includeSpeed
-    ? getAverageString(item, settings.useMiles)
+    ? ` (${getAverageSpeedString(item, speedUnit)})`
     : '';
-  const elevGain = !settings.useMiles
-    ? `${formatNumber(item.total_elevation_gain, 1)}m`
-    : `${formatNumber(toFt(item.total_elevation_gain), 1)}ft`;
+  const elevGain =
+    settings.distanceUnit === 'kilometer'
+      ? `${formatNumber(item.total_elevation_gain, 1)}m`
+      : `${formatNumber(toFt(item.total_elevation_gain), 1)}ft`;
   const elevGainStr = settings.includeElevation
     ? `, ${elevGain} elev gain`
     : '';
@@ -91,13 +94,27 @@ function getDurationString(totalSeconds: number) {
   });
 }
 
-function getAverageString(item: ClubActivity, useMiles: boolean) {
+function getSpeedUnit(type: string, settings: SettingsWithDefaults) {
+  return settings.speedUnitPerActivity[type] || settings.speedUnitDefault;
+}
+
+function getAverageSpeedString(item: ClubActivity, speedUnit: SpeedUnit) {
   const kilometers = item.distance / 1000;
-  const distance = useMiles ? toMiles(kilometers) : kilometers;
-  const timeInHours = item.moving_time / 60 / 60;
-  return ` (${formatNumber(distance / timeInHours)}${
-    useMiles ? 'mph' : 'kmph'
-  })`;
+  const distance =
+    speedUnit === 'mph' || speedUnit === 'min/mi'
+      ? toMiles(kilometers)
+      : kilometers;
+  const timeInMinutes = item.moving_time / 60;
+
+  if (speedUnit === 'mph' || speedUnit === 'kmph') {
+    const timeInHours = timeInMinutes / 60;
+    return `${formatNumber(distance / timeInHours)}${speedUnit}`;
+  }
+
+  return `${formatNumber(timeInMinutes / distance)}${speedUnit.replace(
+    'min',
+    ''
+  )}`;
 }
 
 function formatNumber(num: number, decimalPlaces = 2) {

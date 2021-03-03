@@ -7,8 +7,13 @@
   "stravaRefreshToken": "YourSecretRefreshToken",
   "stravaClub": "YourClub",
   "pollFrequency": 600,
-  "emoji": true,
+  "autoJoin": false,
   "onBotJoinRoomMessage": "Reporting our Club activities",
-  "useMiles": false,
-  "autoJoin": false
+  "emoji": true,
+  "distanceUnit": "mile",
+  "speedUnitDefault": "mph",
+  "speedUnitPerActivity": {
+    "Run": "min/mi",
+    "Walk": "min/mi"
+  }
 }

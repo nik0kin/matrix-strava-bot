@@ -1,3 +1,5 @@
+export type SpeedUnit = 'mph' | 'min/mi' | 'kmph' | 'min/km';
+
 export interface Settings {
   //// SETUP ////
 
@@ -69,11 +71,6 @@ export interface Settings {
    */
   onBotJoinRoomMessage: string | undefined;
   /**
-   * Display the club activity message in miles
-   *   Defaults to `false`
-   */
-  useMiles?: boolean;
-  /**
    * Display club activity elevation
    *   Defaults to `true`
    */
@@ -83,6 +80,39 @@ export interface Settings {
    *   Defaults to `true`
    */
   includeSpeed?: boolean;
+  /**
+   * Display the club activity distance in miles or kilometers
+   *   Defaults to `mile`
+   */
+  distanceUnit?: 'mile' | 'kilometer';
+  /**
+   * Display the club activity speed unit in `mph`, min/mi`, `kmph` or `min/km`
+   *   Defaults to `mph`
+   */
+  speedUnitDefault?: SpeedUnit;
+  /**
+   * Override the speed unit for a given activity type.
+   *    Eg. { "Walk": "kmph" } to show all walking activities in `kmph`, and `speedUnitDefault` for all other activities
+   *    See http://developers.strava.com/docs/reference/#api-models-ActivityType for a list of types
+   *   Defaults to `null`
+   */
+  speedUnitPerActivity?: Record<string, SpeedUnit>;
 }
 
 export type SettingsWithDefaults = Required<Settings>;
+
+export function getSettingsWithDefaults(
+  userSettings: Settings
+): SettingsWithDefaults {
+  return {
+    storageFile: 'bot-storage.json',
+    dryRun: false,
+    autoJoin: false,
+    distanceUnit: 'mile',
+    speedUnitDefault: 'mph',
+    speedUnitPerActivity: {},
+    includeSpeed: true,
+    includeElevation: true,
+    ...userSettings,
+  };
+}
