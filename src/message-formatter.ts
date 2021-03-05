@@ -1,8 +1,14 @@
-import { formatDuration } from 'date-fns';
+import { format, formatDuration } from 'date-fns';
 import { ClubActivity } from 'strava-v3';
 
-import { SettingsWithDefaults, SpeedUnit } from './settings';
 import { toMiles, toFt } from './distance';
+import { SettingsWithDefaults, SpeedUnit } from './settings';
+import { convertTZ } from './timezone';
+import {
+  getSpeedUnit,
+  getTimezone,
+  shouldHideStartingTime,
+} from './settings-helpers';
 
 const activityTypeEmojiMapping: Record<string, string> = {
   AlpineSki: '⛷️',
@@ -44,7 +50,7 @@ const activityTypeEmojiMapping: Record<string, string> = {
   Yoga: '🧘',
 };
 
-// "Bob R. - ActivityTitle - 6.27 miles in 1 hour (6.26mph), 254.6ft elev gain"
+// "Bob R. 🏃 Morning Run - 3.55 miles | 201.77ft elev gain in 31 minutes 39 seconds (6.73mph) starting at 7:56am (40 °F)"
 export function getClubActivityString(
   item: ClubActivity,
   settings: SettingsWithDefaults
@@ -66,13 +72,23 @@ export function getClubActivityString(
       ? `${formatNumber(item.total_elevation_gain, 1)}m`
       : `${formatNumber(toFt(item.total_elevation_gain), 1)}ft`;
   const elevGainStr = settings.includeElevation
-    ? `, ${elevGain} elev gain`
+    ? ` | ${elevGain} elev gain`
     : '';
-  return `${item.athlete.firstname} ${item.athlete.lastname} ${
-    typeEmoji || '-'
-  } ${item.name} - ${distance} in ${getDurationString(
+  const startingTimeStr =
+    settings.includeStartingTime &&
+    !shouldHideStartingTime(getTrimmedName(item.athlete), settings)
+      ? ` starting at ${getStartingTime(item, settings)}`
+      : '';
+
+  return `${getTrimmedName(item.athlete)} ${typeEmoji || '-'} ${
+    item.name
+  } - ${distance}${elevGainStr} in ${getDurationString(
     item.moving_time
-  )}${average}${elevGainStr}`;
+  )}${average}${startingTimeStr}`;
+}
+
+function getTrimmedName(athlete: ClubActivity['athlete']) {
+  return `${athlete.firstname} ${athlete.lastname}`.trim(); // Might help if someone doesnt have a last name set?
 }
 
 function getDurationString(totalSeconds: number) {
@@ -92,10 +108,6 @@ function getDurationString(totalSeconds: number) {
     minutes,
     seconds,
   });
-}
-
-function getSpeedUnit(type: string, settings: SettingsWithDefaults) {
-  return settings.speedUnitPerActivity[type] || settings.speedUnitDefault;
 }
 
 function getAverageSpeedString(item: ClubActivity, speedUnit: SpeedUnit) {
@@ -121,4 +133,22 @@ function formatNumber(num: number, decimalPlaces = 2) {
   const a = Math.pow(10, decimalPlaces);
   num = Math.round(num * a) / a;
   return `${num}`;
+}
+
+// gets human readable time (7:00AM, 12:00PM, etc)
+function getStartingTime(item: ClubActivity, settings: SettingsWithDefaults) {
+  // Guess starting time (processingCurrentTime - item.elapsed_time = activityStartingTime)
+  const activityStartingTime = Date.now() - item.elapsed_time * 1000;
+
+  // Adjust time to activity timezone
+  const timeZone = getTimezone(getTrimmedName(item.athlete), settings);
+  const activityStartingTimeWithTimezoneAdjustment = convertTZ(
+    new Date(activityStartingTime),
+    timeZone
+  );
+
+  return format(activityStartingTimeWithTimezoneAdjustment, 'hh:mm a').replace(
+    ' ',
+    ''
+  );
 }

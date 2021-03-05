@@ -13,7 +13,14 @@
   "distanceUnit": "mile",
   "speedUnitDefault": "mph",
   "speedUnitPerActivity": {
+    "Hike": "min/mi",
     "Run": "min/mi",
     "Walk": "min/mi"
+  },
+  "includeStartingTime": {
+    "timezoneDefault": "America/Chicago",
+    "timezonePerMember": {
+      "Kingo T.": "America/Los_Angeles"
+    }
   }
 }

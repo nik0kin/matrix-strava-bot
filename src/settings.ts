@@ -94,9 +94,32 @@ export interface Settings {
    * Override the speed unit for a given activity type.
    *    Eg. { "Walk": "kmph" } to show all walking activities in `kmph`, and `speedUnitDefault` for all other activities
    *    See http://developers.strava.com/docs/reference/#api-models-ActivityType for a list of types
-   *   Defaults to `null`
+   *   Defaults to `{}` (no overrides)
    */
   speedUnitPerActivity?: Record<string, SpeedUnit>;
+
+  /**
+   * Display the a guesstimate of club activity starting time.
+   *   Defaults to off
+   *
+   * Timezone parameter's must be IANA timezones like "America/Chicago"
+   *   See more at https://www.iana.org/time-zones or https://github.com/dmfilipenko/timezones.json/blob/master/timezones.json
+   */
+  includeStartingTime:
+    | {
+        /**
+         * Timezone to show the activity starting time relative to
+         *   No default
+         */
+        timezoneDefault: string;
+        /**
+         * Override the timezone for a given club member. If set to null, the starting time won't be shown for the member's activities.
+         *    Eg. { "Kingo T.": "America/Los_Angeles" } to show the starting time of all Kingo T's relative to Los Angeles time, and `timezoneDefault` for all other club members
+         *   Defaults to `{}` (no overrides)
+         */
+        timezonePerMember?: Record<string, string | null>;
+      }
+    | undefined;
 }
 
 export type SettingsWithDefaults = Required<Settings>;

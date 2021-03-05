@@ -1,0 +1,26 @@
+{
+  "homeserverUrl": "https://localhost",
+  "matrixAccessToken": "YourSecretAccessToken",
+  "stravaClientId": "YourStravaApiClientId",
+  "stravaClientSecret": "YourStravaApiClientSecret",
+  "stravaAccessToken": "YourSecretAccessToken",
+  "stravaRefreshToken": "YourSecretRefreshToken",
+  "stravaClub": "YourClub",
+  "pollFrequency": 600,
+  "autoJoin": false,
+  "onBotJoinRoomMessage": "Reporting our Club activities",
+  "emoji": true,
+  "distanceUnit": "kilometer",
+  "speedUnitDefault": "kmph",
+  "speedUnitPerActivity": {
+    "Hike": "min/km",
+    "Run": "min/km",
+    "Walk": "min/km"
+  },
+  "includeStartingTime": {
+    "timezoneDefault": "Europe/London",
+    "timezonePerMember": {
+      "Kingo T.": "Europe/Berlin"
+    }
+  }
+}

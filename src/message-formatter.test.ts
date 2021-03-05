@@ -17,6 +17,7 @@ describe('getClubActivityString', () => {
       onBotJoinRoomMessage: undefined,
       includeElevation: false,
       includeSpeed: false,
+      includeStartingTime: undefined,
     };
     return { ...getSettingsWithDefaults(testDefaults), ...partialSettings };
   }
@@ -52,6 +53,7 @@ describe('getClubActivityString', () => {
       'Olaf P. - Dog walk and leafing - 2.03 kilometers in 33 minutes 57 seconds'
     );
   });
+
   test('should work in miles mode', () => {
     expect(
       getClubActivityString(
@@ -72,6 +74,7 @@ describe('getClubActivityString', () => {
       )
     ).toEqual('Alfred C. - Morning Run - 6.27 miles in 1 hour');
   });
+
   test('should work in mph speed mode with elevation and average speed', () => {
     const settings: Partial<Settings> = {
       distanceUnit: 'mile',
@@ -83,14 +86,15 @@ describe('getClubActivityString', () => {
     expect(
       getClubActivityString(clubActivitiesFixture[0], getSettings(settings))
     ).toEqual(
-      'Carl M. - Morning Ride - 7.29 miles in 1 hour 21 minutes (5.4mph), 1657.8ft elev gain'
+      'Carl M. - Morning Ride - 7.29 miles | 1657.8ft elev gain in 1 hour 21 minutes (5.4mph)'
     );
     expect(
       getClubActivityString(clubActivitiesFixture[1], getSettings(settings))
     ).toEqual(
-      'Alfred C. - Morning Run - 6.27 miles in 1 hour (6.26mph), 254.6ft elev gain'
+      'Alfred C. - Morning Run - 6.27 miles | 254.6ft elev gain in 1 hour (6.26mph)'
     );
   });
+
   test('should work in min/mi speed mode with elevation', () => {
     const settings: Partial<Settings> = {
       distanceUnit: 'mile',
@@ -102,9 +106,10 @@ describe('getClubActivityString', () => {
     expect(
       getClubActivityString(clubActivitiesFixture[1], getSettings(settings))
     ).toEqual(
-      'Alfred C. - Morning Run - 6.27 miles in 1 hour (9.58/mi), 254.6ft elev gain'
+      'Alfred C. - Morning Run - 6.27 miles | 254.6ft elev gain in 1 hour (9.58/mi)'
     );
   });
+
   test('should work with speedUnitPerActivity override with no elevation', () => {
     const settings: Partial<Settings> = {
       distanceUnit: 'mile',
@@ -115,5 +120,45 @@ describe('getClubActivityString', () => {
     expect(
       getClubActivityString(clubActivitiesFixture[1], getSettings(settings))
     ).toEqual('Alfred C. - Morning Run - 6.27 miles in 1 hour (9.58/mi)');
+  });
+
+  test('should work with starting time shown', () => {
+    const settings: Partial<Settings> = {
+      includeStartingTime: {
+        timezoneDefault: 'America/Chicago',
+      },
+    };
+    const clubActivityString = getClubActivityString(
+      clubActivitiesFixture[1],
+      getSettings(settings)
+    );
+    // Manually verify timezone code works...
+    console.log(
+      'Did this activity start a hour ago in chicago?\n  ' + clubActivityString
+    );
+    expect(clubActivityString).toContain(
+      'Alfred C. - Morning Run - 6.27 miles in 1 hour starting at '
+    );
+  });
+
+  test('should work with starting time shown, speed, and elevation', () => {
+    const settings: Partial<Settings> = {
+      includeStartingTime: {
+        timezoneDefault: 'America/Chicago',
+      },
+      includeSpeed: true,
+      includeElevation: true,
+    };
+    const clubActivityString = getClubActivityString(
+      clubActivitiesFixture[1],
+      getSettings(settings)
+    );
+    // Manually verify timezone code works...
+    console.log(
+      'Did this activity start a hour ago in chicago?\n  ' + clubActivityString
+    );
+    expect(clubActivityString).toContain(
+      'Alfred C. - Morning Run - 6.27 miles | 254.6ft elev gain in 1 hour (6.26mph) starting at '
+    );
   });
 });
