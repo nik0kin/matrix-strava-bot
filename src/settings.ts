@@ -118,6 +118,11 @@ export interface Settings {
          *   Defaults to `{}` (no overrides)
          */
         timezonePerMember?: Record<string, string | null>;
+        /**
+         * Use military time for starting time string. Eg. 05:00
+         *   Defaults to `false`
+         */
+        militaryTime?: boolean;
       }
     | undefined;
 }

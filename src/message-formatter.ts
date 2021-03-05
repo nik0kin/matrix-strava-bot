@@ -88,7 +88,7 @@ export function getClubActivityString(
 }
 
 function getTrimmedName(athlete: ClubActivity['athlete']) {
-  return `${athlete.firstname} ${athlete.lastname}`.trim(); // Might help if someone doesnt have a last name set?
+  return `${athlete.firstname} ${athlete.lastname}`.trim(); // Might help if someone doesnt have a last name set on strava?
 }
 
 function getDurationString(totalSeconds: number) {
@@ -135,7 +135,7 @@ function formatNumber(num: number, decimalPlaces = 2) {
   return `${num}`;
 }
 
-// gets human readable time (7:00AM, 12:00PM, etc)
+// gets human readable time (7:00am, 12:00pm, etc)
 function getStartingTime(item: ClubActivity, settings: SettingsWithDefaults) {
   // Guess starting time (processingCurrentTime - item.elapsed_time = activityStartingTime)
   const activityStartingTime = Date.now() - item.elapsed_time * 1000;
@@ -147,8 +147,12 @@ function getStartingTime(item: ClubActivity, settings: SettingsWithDefaults) {
     timeZone
   );
 
-  return format(activityStartingTimeWithTimezoneAdjustment, 'hh:mm a').replace(
-    ' ',
-    ''
-  );
+  const timeFormat = settings.includeStartingTime?.militaryTime
+    ? 'HH:mm'
+    : 'h:mm aaa';
+
+  return format(activityStartingTimeWithTimezoneAdjustment, timeFormat)
+    .replace(' ', '')
+    .replace('AM', 'am')
+    .replace('PM', 'pm');
 }

@@ -161,4 +161,27 @@ describe('getClubActivityString', () => {
       'Alfred C. - Morning Run - 6.27 miles | 254.6ft elev gain in 1 hour (6.26mph) starting at '
     );
   });
+
+  test('should work with starting time shown in military time', () => {
+    const settings: Partial<Settings> = {
+      includeStartingTime: {
+        timezoneDefault: 'America/Chicago',
+        militaryTime: true,
+      },
+      includeSpeed: true,
+      includeElevation: true,
+    };
+    const clubActivityString = getClubActivityString(
+      clubActivitiesFixture[1],
+      getSettings(settings)
+    );
+    // Manually verify timezone code works...
+    console.log(
+      'Did this activity start a hour ago in chicago (in military time)?\n  ' +
+        clubActivityString
+    );
+    expect(clubActivityString).toContain(
+      'Alfred C. - Morning Run - 6.27 miles | 254.6ft elev gain in 1 hour (6.26mph) starting at '
+    );
+  });
 });
