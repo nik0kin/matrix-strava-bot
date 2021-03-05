@@ -82,12 +82,12 @@ export interface Settings {
   includeSpeed?: boolean;
   /**
    * Display the club activity distance in miles or kilometers
-   *   Defaults to `mile`
+   *   Defaults to `kilometer`
    */
   distanceUnit?: 'mile' | 'kilometer';
   /**
    * Display the club activity speed unit in `mph`, min/mi`, `kmph` or `min/km`
-   *   Defaults to `mph`
+   *   Defaults to `kmph`
    */
   speedUnitDefault?: SpeedUnit;
   /**
@@ -136,8 +136,8 @@ export function getSettingsWithDefaults(
     storageFile: 'bot-storage.json',
     dryRun: false,
     autoJoin: false,
-    distanceUnit: 'mile',
-    speedUnitDefault: 'mph',
+    distanceUnit: 'kilometer',
+    speedUnitDefault: 'kmph',
     speedUnitPerActivity: {},
     includeSpeed: true,
     includeElevation: true,
