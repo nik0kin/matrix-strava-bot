@@ -141,16 +141,17 @@ function getAverageSpeedString(item: ClubActivity, speedUnit: SpeedUnit) {
     return `${formatNumber(distance / timeInHours)}${speedUnit}`;
   }
 
-  return `${formatNumber(timeInMinutes / distance)}${speedUnit.replace(
-    'min',
-    ''
-  )}`;
+  return `${formatTime(timeInMinutes / distance)}${speedUnit}`;
 }
 
 function formatNumber(num: number, decimalPlaces = 2) {
   const a = Math.pow(10, decimalPlaces);
   num = Math.round(num * a) / a;
   return `${num}`;
+}
+
+function formatTime(minutes: number) {
+  return `${Math.floor(minutes)}:${Math.floor((minutes % 1) * 60)}`;
 }
 
 // gets human readable time (7:00am, 12:00pm, etc)

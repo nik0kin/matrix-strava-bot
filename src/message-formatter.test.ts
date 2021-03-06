@@ -122,7 +122,7 @@ describe('getClubActivityString', () => {
         getSettings(settings)
       )
     ).toEqual(
-      'Alfred C. - Morning Run - 6.27 miles | 254.6ft elev gain in 1 hour (9.58/mi)'
+      'Alfred C. - Morning Run - 6.27 miles | 254.6ft elev gain in 1 hour (9:34min/mi)'
     );
   });
 
@@ -138,7 +138,7 @@ describe('getClubActivityString', () => {
         clubActivitiesFixture[1],
         getSettings(settings)
       )
-    ).toEqual('Alfred C. - Morning Run - 6.27 miles in 1 hour (9.58/mi)');
+    ).toEqual('Alfred C. - Morning Run - 6.27 miles in 1 hour (9:34min/mi)');
   });
 
   test('should work with starting time shown', async () => {
