@@ -3,11 +3,8 @@ import { MatrixClient, SimpleFsStorageProvider } from 'matrix-bot-sdk';
 import { ClubActivity } from 'strava-v3';
 
 import { getClubActivityString } from './message-formatter';
-import {
-  Settings,
-  SettingsWithDefaults,
-  getSettingsWithDefaults,
-} from './settings';
+import { Settings, SettingsWithDefaults } from './settings';
+import { getValidatedSettingsWithDefaults } from './settings-helpers';
 import { createMatrixClient, sendMessageToAllJoinedRooms } from './matrix-bot';
 import { listStravaClubActivities, setupStrava } from './strava';
 import {
@@ -67,10 +64,13 @@ async function checkForRecentActivities(
   }
 
   console.log('checkForRecentActivities');
-  const activitiesMessage = data
+  const activitiesMessagePromises = data
     .filter((a) => !hasBeenReported(a))
-    .map((a) => getClubActivityString(a, settings))
-    .join('\n');
+    .map((a) => getClubActivityString(a, settings));
+
+  const activitiesMessage = (await Promise.all(activitiesMessagePromises)).join(
+    '\n'
+  );
   if (!activitiesMessage) {
     return;
   }
@@ -89,7 +89,7 @@ async function checkForRecentActivities(
  * Starts the Matrix bot and refreshes the Strava accessToken
  */
 export async function startBot(userSettings: Settings) {
-  const settings = getSettingsWithDefaults(userSettings);
+  const settings = getValidatedSettingsWithDefaults(userSettings);
 
   // Connect to Matrix
   const botClient = createMatrixClient(settings);

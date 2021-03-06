@@ -1,6 +1,7 @@
 import { getClubActivityString } from './message-formatter';
 import { clubActivitiesFixture } from './data-fixture';
-import { Settings, getSettingsWithDefaults } from './settings';
+import { Settings } from './settings';
+import { getValidatedSettingsWithDefaults } from './settings-helpers';
 
 describe('getClubActivityString', () => {
   function getSettings(partialSettings: Partial<Settings>) {
@@ -15,16 +16,22 @@ describe('getClubActivityString', () => {
       pollFrequency: 100,
       emoji: false,
       onBotJoinRoomMessage: undefined,
+      distanceUnit: 'mile',
+      speedUnitDefault: 'mph',
       includeElevation: false,
       includeSpeed: false,
       includeStartingTime: undefined,
+      includeTemp: undefined,
     };
-    return { ...getSettingsWithDefaults(testDefaults), ...partialSettings };
+    return {
+      ...getValidatedSettingsWithDefaults(testDefaults),
+      ...partialSettings,
+    };
   }
 
-  test('should work in kilometer mode with no extra formating', () => {
+  test('should work in kilometer mode with no extra formating', async () => {
     expect(
-      getClubActivityString(
+      await getClubActivityString(
         clubActivitiesFixture[0],
         getSettings({
           speedUnitPerActivity: {},
@@ -33,7 +40,7 @@ describe('getClubActivityString', () => {
       )
     ).toEqual('Carl M. - Morning Ride - 11.73 kilometers in 1 hour 21 minutes');
     expect(
-      getClubActivityString(
+      await getClubActivityString(
         clubActivitiesFixture[1],
         getSettings({
           speedUnitPerActivity: {},
@@ -42,7 +49,7 @@ describe('getClubActivityString', () => {
       )
     ).toEqual('Alfred C. - Morning Run - 10.09 kilometers in 1 hour');
     expect(
-      getClubActivityString(
+      await getClubActivityString(
         clubActivitiesFixture[2],
         getSettings({
           speedUnitPerActivity: {},
@@ -54,9 +61,9 @@ describe('getClubActivityString', () => {
     );
   });
 
-  test('should work in miles mode', () => {
+  test('should work in miles mode', async () => {
     expect(
-      getClubActivityString(
+      await getClubActivityString(
         clubActivitiesFixture[0],
         getSettings({
           speedUnitPerActivity: {},
@@ -65,7 +72,7 @@ describe('getClubActivityString', () => {
       )
     ).toEqual('Carl M. - Morning Ride - 7.29 miles in 1 hour 21 minutes');
     expect(
-      getClubActivityString(
+      await getClubActivityString(
         clubActivitiesFixture[1],
         getSettings({
           speedUnitPerActivity: {},
@@ -75,7 +82,7 @@ describe('getClubActivityString', () => {
     ).toEqual('Alfred C. - Morning Run - 6.27 miles in 1 hour');
   });
 
-  test('should work in mph speed mode with elevation and average speed', () => {
+  test('should work in mph speed mode with elevation and average speed', async () => {
     const settings: Partial<Settings> = {
       distanceUnit: 'mile',
       speedUnitDefault: 'mph',
@@ -84,18 +91,24 @@ describe('getClubActivityString', () => {
       includeElevation: true,
     };
     expect(
-      getClubActivityString(clubActivitiesFixture[0], getSettings(settings))
+      await getClubActivityString(
+        clubActivitiesFixture[0],
+        getSettings(settings)
+      )
     ).toEqual(
       'Carl M. - Morning Ride - 7.29 miles | 1657.8ft elev gain in 1 hour 21 minutes (5.4mph)'
     );
     expect(
-      getClubActivityString(clubActivitiesFixture[1], getSettings(settings))
+      await getClubActivityString(
+        clubActivitiesFixture[1],
+        getSettings(settings)
+      )
     ).toEqual(
       'Alfred C. - Morning Run - 6.27 miles | 254.6ft elev gain in 1 hour (6.26mph)'
     );
   });
 
-  test('should work in min/mi speed mode with elevation', () => {
+  test('should work in min/mi speed mode with elevation', async () => {
     const settings: Partial<Settings> = {
       distanceUnit: 'mile',
       speedUnitDefault: 'min/mi',
@@ -104,13 +117,16 @@ describe('getClubActivityString', () => {
       includeElevation: true,
     };
     expect(
-      getClubActivityString(clubActivitiesFixture[1], getSettings(settings))
+      await getClubActivityString(
+        clubActivitiesFixture[1],
+        getSettings(settings)
+      )
     ).toEqual(
       'Alfred C. - Morning Run - 6.27 miles | 254.6ft elev gain in 1 hour (9.58/mi)'
     );
   });
 
-  test('should work with speedUnitPerActivity override with no elevation', () => {
+  test('should work with speedUnitPerActivity override with no elevation', async () => {
     const settings: Partial<Settings> = {
       distanceUnit: 'mile',
       speedUnitDefault: 'mph',
@@ -118,17 +134,20 @@ describe('getClubActivityString', () => {
       includeSpeed: true,
     };
     expect(
-      getClubActivityString(clubActivitiesFixture[1], getSettings(settings))
+      await getClubActivityString(
+        clubActivitiesFixture[1],
+        getSettings(settings)
+      )
     ).toEqual('Alfred C. - Morning Run - 6.27 miles in 1 hour (9.58/mi)');
   });
 
-  test('should work with starting time shown', () => {
+  test('should work with starting time shown', async () => {
     const settings: Partial<Settings> = {
       includeStartingTime: {
         timezoneDefault: 'America/Chicago',
       },
     };
-    const clubActivityString = getClubActivityString(
+    const clubActivityString = await getClubActivityString(
       clubActivitiesFixture[1],
       getSettings(settings)
     );
@@ -141,7 +160,7 @@ describe('getClubActivityString', () => {
     );
   });
 
-  test('should work with starting time shown, speed, and elevation', () => {
+  test('should work with starting time shown, speed, and elevation', async () => {
     const settings: Partial<Settings> = {
       includeStartingTime: {
         timezoneDefault: 'America/Chicago',
@@ -149,7 +168,7 @@ describe('getClubActivityString', () => {
       includeSpeed: true,
       includeElevation: true,
     };
-    const clubActivityString = getClubActivityString(
+    const clubActivityString = await getClubActivityString(
       clubActivitiesFixture[1],
       getSettings(settings)
     );
@@ -162,7 +181,7 @@ describe('getClubActivityString', () => {
     );
   });
 
-  test('should work with starting time shown in military time', () => {
+  test('should work with starting time shown in military time', async () => {
     const settings: Partial<Settings> = {
       includeStartingTime: {
         timezoneDefault: 'America/Chicago',
@@ -171,7 +190,7 @@ describe('getClubActivityString', () => {
       includeSpeed: true,
       includeElevation: true,
     };
-    const clubActivityString = getClubActivityString(
+    const clubActivityString = await getClubActivityString(
       clubActivitiesFixture[1],
       getSettings(settings)
     );

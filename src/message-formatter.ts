@@ -3,12 +3,15 @@ import { ClubActivity } from 'strava-v3';
 
 import { toMiles, toFt } from './distance';
 import { SettingsWithDefaults, SpeedUnit } from './settings';
-import { convertTZ } from './timezone';
 import {
   getSpeedUnit,
   getTimezone,
   shouldHideStartingTime,
+  getLocation,
+  shouldHideTemperature,
 } from './settings-helpers';
+import { getTemperature } from './temperature';
+import { convertTZ } from './timezone';
 
 const activityTypeEmojiMapping: Record<string, string> = {
   AlpineSki: '⛷️',
@@ -50,8 +53,8 @@ const activityTypeEmojiMapping: Record<string, string> = {
   Yoga: '🧘',
 };
 
-// "Bob R. 🏃 Morning Run - 3.55 miles | 201.77ft elev gain in 31 minutes 39 seconds (6.73mph) starting at 7:56am (40 °F)"
-export function getClubActivityString(
+// "Bob R. 🏃 Morning Run - 3.55 miles | 201.77ft elev gain in 31 minutes 39 seconds (6.73mph) starting at 7:56am (40°F)"
+export async function getClubActivityString(
   item: ClubActivity,
   settings: SettingsWithDefaults
 ) {
@@ -74,17 +77,32 @@ export function getClubActivityString(
   const elevGainStr = settings.includeElevation
     ? ` | ${elevGain} elev gain`
     : '';
+  const athleteName = getTrimmedName(item.athlete);
   const startingTimeStr =
     settings.includeStartingTime &&
-    !shouldHideStartingTime(getTrimmedName(item.athlete), settings)
+    !shouldHideStartingTime(athleteName, settings)
       ? ` starting at ${getStartingTime(item, settings)}`
       : '';
+
+  let temp: string = '';
+  try {
+    if (settings.includeTemp && !shouldHideTemperature(athleteName, settings)) {
+      const location = getLocation(athleteName, settings);
+      temp = ` (${await getTemperature(
+        location,
+        Date.now() - item.elapsed_time * 1000,
+        settings
+      )}°${settings.includeTemp.unit === 'metric' ? 'C' : 'F'})`;
+    }
+  } catch (e) {
+    // ignore
+  }
 
   return `${getTrimmedName(item.athlete)} ${typeEmoji || '-'} ${
     item.name
   } - ${distance}${elevGainStr} in ${getDurationString(
     item.moving_time
-  )}${average}${startingTimeStr}`;
+  )}${average}${startingTimeStr}${temp}`;
 }
 
 function getTrimmedName(athlete: ClubActivity['athlete']) {

@@ -1,5 +1,10 @@
 export type SpeedUnit = 'mph' | 'min/mi' | 'kmph' | 'min/km';
 
+export interface WeatherSearchLocation {
+  q?: string; // See https://www.weatherapi.com/docs/#intro-request `q`
+  coordinate?: [number, number];
+}
+
 export interface Settings {
   //// SETUP ////
 
@@ -97,7 +102,6 @@ export interface Settings {
    *   Defaults to `{}` (no overrides)
    */
   speedUnitPerActivity?: Record<string, SpeedUnit>;
-
   /**
    * Display the a guesstimate of club activity starting time.
    *   Defaults to off
@@ -109,7 +113,6 @@ export interface Settings {
     | {
         /**
          * Timezone to show the activity starting time relative to
-         *   No default
          */
         timezoneDefault: string;
         /**
@@ -125,22 +128,47 @@ export interface Settings {
         militaryTime?: boolean;
       }
     | undefined;
+  /**
+   * Display the temperature during the guesstimate of club activity starting time.
+   *   Defaults to off
+   *
+   * `weatherApiDotComApiKey` or `getTemperature` must be set
+   */
+  includeTemp:
+    | {
+        /**
+         * Api Key for Weather API
+         *
+         * Uses an external service (other than strava)
+         *   Get api key at https://www.weatherapi.com/
+         */
+        weatherApiDotComApiKey?: string;
+        /**
+         * Display the club activity temperature in metric (C) or imperial (F)
+         *   Defaults to `metric`
+         */
+        unit: 'imperial' | 'metric';
+        /**
+         * Location to look up the temperature for activities
+         */
+        locationDefault: WeatherSearchLocation;
+        /**
+         * Override the location for a given club member. If set to null, the temperature won't be shown for the member's activities.
+         *    Eg. { "Kingo T.": { coordinates: [34.0522,-118.2437]} } to show temperature of all Kingo T's in Los Angeles, and `locationDefault` for all other club members
+         *   Defaults to `{}` (no overrides)
+         */
+        locationPerMember?: Record<string, WeatherSearchLocation | null>;
+        /**
+         * Set a callback function to lookup temperature that is called instead of a WeatherApi request
+         *
+         * Cannot be used in bootstrap mode
+         */
+        getTemperature?: (
+          params: WeatherSearchLocation,
+          time: number
+        ) => number;
+      }
+    | undefined;
 }
 
 export type SettingsWithDefaults = Required<Settings>;
-
-export function getSettingsWithDefaults(
-  userSettings: Settings
-): SettingsWithDefaults {
-  return {
-    storageFile: 'bot-storage.json',
-    dryRun: false,
-    autoJoin: false,
-    distanceUnit: 'kilometer',
-    speedUnitDefault: 'kmph',
-    speedUnitPerActivity: {},
-    includeSpeed: true,
-    includeElevation: true,
-    ...userSettings,
-  };
-}

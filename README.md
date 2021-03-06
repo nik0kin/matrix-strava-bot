@@ -26,7 +26,7 @@ yarn dev
 # clone repo
 yarn install
 
-cp bot-config.sample.json bot-config.json
+cp bot-config.sample-world.json bot-config.json
 # configure bot-config.json
 
 yarn global add pm2

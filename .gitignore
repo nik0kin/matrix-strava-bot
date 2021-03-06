@@ -4,3 +4,4 @@ bot-config.json
 coverage
 dist
 .ideas.txt
+src/temperature.test.ts
