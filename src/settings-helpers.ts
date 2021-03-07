@@ -32,8 +32,12 @@ export function getValidatedSettingsWithDefaults(
   }
 
   if (
-    (settings.includeTemp && !settings.includeTemp.weatherApiDotComApiKey) ||
-    settings.includeTemp?.locationDefault
+    settings.includeTemp &&
+    (!(
+      settings.includeTemp.weatherApiDotComApiKey ||
+      settings.includeTemp.getTemperature
+    ) ||
+      !settings.includeTemp.locationDefault)
   ) {
     console.error(
       '`includeTemp.weatherApiDotComApiKey` or `includeTemp.locationDefault` not set, turning `includeTemp` off'
